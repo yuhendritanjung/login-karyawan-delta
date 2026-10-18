@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Informasi Karyawan Delta</title>
     <style>
+        /* Gaya dasar tampilan login */
         body {
             font-family: Arial, sans-serif;
             background-color: #1a4f8a;
@@ -68,8 +69,10 @@
         <h2>Sistem Informasi Karyawan Delta</h2>
         <p class="subtitle">Login Karyawan</p>
 
+        <!-- Kotak Pesan Error -->
         <div id="errorDiv">❌ ID Karyawan atau Password Salah!</div>
 
+        <!-- Form Login -->
         <form id="loginForm">
             <div class="form-group">
                 <label for="usernameInput">ID Karyawan</label>
@@ -83,10 +86,40 @@
         </form>
     </div>
 
-    <script type="module">
+    <!-- ========================================== -->
+    <!-- 1. PANGGIL FIREBASE SDK LANGSUNG (TANPA JS/) -->
+    <!-- ========================================== -->
+    <script src="firebase-app-compat.js"></script>
+    <script src="firebase-auth-compat.js"></script>
+    <script src="firebase-firestore-compat.js"></script>
+
+    <!-- ========================================== -->
+    <!-- 2. KONFIGURASI FIREBASE ASLI MILIK ANDA -->
+    <!-- ========================================== -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZmYWxh3E5Zx_5rK8CX1ER2p6tavqS_c8",
+            authDomain: "://firebaseapp.com",
+            projectId: "chemis-delta",
+            storageBucket: "://appspot.com",
+            messagingSenderId: "1032338692754", 
+            appId: "1:1032338692754:web:6e6f432709e3ee7964b07e"
+        };
+        
+        // Inisialisasi Firebase ke aplikasi
+        firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <!-- ========================================== -->
+    <!-- 3. LOGIKA PROSES LOGIN (KODE ANDA) -->
+    <!-- ========================================== -->
+     <!-- Hapus script lama Anda dan ganti dengan satu blok script module ini -->
+        <script type="module">
+        // 1. Import fungsi-fungsi yang dibutuhkan dari CDN Firebase resmi (URL LENGKAP)
         import { initializeApp } from "https://gstatic.com";
         import { getAuth, signInWithEmailAndPassword } from "https://gstatic.com";
 
+        // 2. Konfigurasi Firebase asli milik Anda (SUDAH DIPERBAIKI)
         const firebaseConfig = {
             apiKey: "AIzaSyBZmYWxh3E5Zx_5rK8CX1ER2p6tavqS_c8",
             authDomain: "://firebaseapp.com",
@@ -98,26 +131,33 @@
             measurementId: "G-V8L7163N6X"
         };
 
+        // 3. Inisialisasi Firebase dan Auth
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        // 4. Daftarkan elemen DOM
         const loginForm = document.getElementById('loginForm');
         const errorDiv = document.getElementById('errorDiv');
         const usernameInput = document.getElementById('usernameInput');
         const passwordInput = document.getElementById('passwordInput');
 
+        // 5. Logika Proses Login
         loginForm.addEventListener('submit', function(event) {
+            // Mencegah halaman reload otomatis
             event.preventDefault(); 
+            
             errorDiv.style.display = 'none';
             
             let userInput = usernameInput.value;
             let passwordInputValue = passwordInput.value;
             
+            // Otomatis menambahkan domain perusahaan jika user tidak mengetik '@'
             let formattedEmail = userInput;
             if (!userInput.includes('@')) {
                 formattedEmail = userInput + "@rayon1.com";
             }
             
+            // Proses Otentikasi gaya baru
             signInWithEmailAndPassword(auth, formattedEmail, passwordInputValue)
                 .then((userCredential) => {
                     alert("Login Berhasil! Selamat bekerja.");
@@ -130,6 +170,3 @@
                 });
         });
     </script>
-
-</body>
-</html>
