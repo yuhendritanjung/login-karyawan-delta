@@ -3,60 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Absensi & Laporan Kerja</title>
-
+    <title>Sistem Informasi Karyawan Delta</title>
     <style>
-        /* GAYA TAMPILAN (CSS) */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 450px; }
-        h2, h3 { text-align: center; color: #333; }
-        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; background-color: #007bff; }
-        .status { font-size: 14px; text-align: center; color: #666; margin-top: 10px; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a4f8a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h2 { margin-bottom: 5px; color: #333; }
+        p.subtitle { color: #666; margin-top: 0; margin-bottom: 25px; }
+        .form-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #444; }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        button:hover { background-color: #0056b3; }
+        #errorDiv {
+            color: red;
+            background-color: #ffe6e6;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+            font-size: 14px;
+            border: 1px solid #ffa3a3;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Sistem Informasi Karyawan Delta</h2>
 
-        <!-- FORM LOGIN -->
-        <div id="loginSection" class="card">
-            <h3>Login Karyawan</h3>
-            <input type="text" id="loginId" placeholder="Masukkan ID Karyawan (Contoh: delta)" required>
-            <input type="password" id="loginPassword" placeholder="Masukkan Password" required>
-            <button class="btn" onclick="login()">Masuk</button>
-            <div id="statusLogin" class="status"></div>
-        </div>
+    <div class="login-container">
+        <h2>Sistem Informasi Karyawan Delta</h2>
+        <p class="subtitle">Login Karyawan</p>
+
+        <div id="errorDiv">❌ ID Karyawan atau Password Salah!</div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="usernameInput">ID Karyawan</label>
+                <input type="text" id="usernameInput" placeholder="Masukkan nama ID Anda (contoh: jojoanugrah)" required>
+            </div>
+            <div class="form-group">
+                <label for="passwordInput">Kata Sandi</label>
+                <input type="password" id="passwordInput" placeholder="Masukkan Password Anda" required>
+            </div>
+            <button type="submit">Masuk</button>
+        </form>
     </div>
 
-    <script>
-        // FUNGSI LOGIN DIREKTUR TANPA DEPENDENSI FIREBASE EXTERNAL
-        function login() {
-            const idKaryawan = document.getElementById('loginId').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            const statusText = document.getElementById('statusLogin');
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getAuth, signInWithEmailAndPassword } from "https://gstatic.com";
 
-            if (!idKaryawan || !password) {
-                alert("ID dan Password wajib diisi!");
-                return;
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZmYWxh3E5Zx_5rK8CX1ER2p6tavqS_c8",
+            authDomain: "://firebaseapp.com",
+            databaseURL: "https://firebaseio.com",
+            projectId: "chemis-delta",
+            storageBucket: "chemis-delta.firebasestorage.app",
+            messagingSenderId: "162814579641",
+            appId: "1:162814579641:web:cf6ec71e7df4969be0dc68",
+            measurementId: "G-V8L7163N6X"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const loginForm = document.getElementById('loginForm');
+        const errorDiv = document.getElementById('errorDiv');
+        const usernameInput = document.getElementById('usernameInput');
+        const passwordInput = document.getElementById('passwordInput');
+
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            errorDiv.style.display = 'none';
+            
+            let userInput = usernameInput.value;
+            let passwordInputValue = passwordInput.value;
+            
+            let formattedEmail = userInput;
+            if (!userInput.includes('@')) {
+                formattedEmail = userInput + "@rayon1.com";
             }
-
-            statusText.innerText = "Memverifikasi...";
-            statusText.style.color = "#666";
-
-            // LOGIKA VALIDASI LOKAL (Silakan sesuaikan ID dan Password yang Anda inginkan di sini)
-            if (idKaryawan.toLowerCase() === "delta" && password === "Admin123") {
-                statusText.innerText = "✅ Login Berhasil! Mengalihkan...";
-                statusText.style.color = "green";
-                
-                // Langsung berpindah halaman ke Google Sheet Anda di tab yang sama
-                window.location.href = "https://docs.google.com/spreadsheets/d/13LOxjXsBtLFwIvIU4b8btCa2Xnr-nfov86aEz-6lnHo/edit?usp=sharing";
-            } else {
-                statusText.innerText = "❌ ID Karyawan atau Password Salah!";
-                statusText.style.color = "red";
-            }
-        }
+            
+            signInWithEmailAndPassword(auth, formattedEmail, passwordInputValue)
+                .then((userCredential) => {
+                    alert("Login Berhasil! Selamat bekerja.");
+                    window.location.href = "https://docs.google.com/spreadsheets/d/13LOxjXsBtLFwIvIU4b8btCa2Xnr-nfov86aEz-6lnHo/edit?usp=sharing";
+                })
+                .catch((error) => {
+                    console.error("Firebase Auth Error: ", error.code, error.message);
+                    errorDiv.innerText = "❌ ID Karyawan atau Password Salah!";
+                    errorDiv.style.display = 'block';
+                });
+        });
     </script>
+
 </body>
 </html>
